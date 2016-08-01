@@ -1,0 +1,272 @@
+
+#include<stdlib.h>
+#include<iostream>
+using namespace std;
+struct PCB{
+	double id;
+	struct PCB*next;
+};
+
+void add(struct PCB *head,struct PCB*process){
+   struct PCB*tmp=head;
+   while(tmp->next!=NULL)
+       tmp=tmp->next;
+   tmp->next=process;
+   process->next=NULL;
+}
+
+struct PCB* path(struct PCB*head)
+{
+	struct PCB*p=(struct PCB *)malloc(sizeof(struct PCB));
+	if(head->next!=NULL)
+	{
+		head->next=p;
+		head->next=p->next;
+		p->next=NULL;
+	}
+	else
+	    cout<<"暂无可用的PCB"<<endl;
+    return p;
+}
+
+
+struct PCB* run(struct PCB*head,struct PCB*p){
+	if(head->next!=NULL)
+	{
+		p=path(ready);
+	    add(running,p);
+	}
+	else
+		cout<<"有PCB正在执行，请稍候再试"<<endl;
+	return p;
+}
+
+void block(struct PCB*head,struct PCB*p){
+	p=path(running);
+	add(blocked,p);
+/*	struct PCB*q;
+	q=head;
+	if(head->next!=NULL)
+		q=q->next;
+	q->next=p;*/
+}
+/*void ready(struct PCB*head1,struct PCB*head2,struct PCB*p){
+	struct PCB*m=(struct PCB *)malloc(sizeof(struct PCB));
+	if(head1->next!=NULL)
+	{
+		head1->next=m;
+		head1->next=m->next;
+		m->next=NULL;
+	}
+	else
+	{
+		cout<<"暂无阻塞状态"<<endl;
+	}
+	struct PCB*n=(struct PCB *)malloc(sizeof(struct PCB));
+	if(head2->next!=NULL)
+	{
+		head2->next=n;
+		n=n->next;
+	}
+	n->next=m;
+}
+*/
+void ready(struct PCB*head1,struct PCB*head2,struct PCB*p)
+{
+	if(head1->next==NULL){
+		cout<<"暂无阻塞状态，请稍后再试！"<<endl;
+	    continue;
+	else
+		p=path(blocked);
+	    add(ready,p);
+}
+
+
+
+void showPCB(struct PCB*head){
+	struct PCB*q=head;
+	while(q->next!=NULL){
+		q=q->next;
+		cout<<"进程ID"<<q->id<<endl;
+	}
+}
+
+void show(struct PCB*ready,struct PCB*blocked,struct PCB*running){
+	cout<<"就绪的进程:"<<endl;
+    showPCB(ready);
+	cout<<endl;
+	cout<<"执行的进程:"<<endl;
+    showPCB(running);
+	cout<<endl;
+	cout<<"阻塞的进程:"<<endl;
+    showPCB(blocked);
+	cout<<endl;
+
+}
+
+
+void main()
+{
+	cout<<"******************************************"<<endl;
+	cout<<"      *****    c  创建进程    *****       "<<endl;
+	cout<<"      *****    z  执行进程    *****       "<<endl;
+	cout<<"      *****    t  时间片段    *****       "<<endl;
+	cout<<"      *****    b  阻塞进程    *****       "<<endl;
+	cout<<"      *****    w  唤醒进程    *****       "<<endl;
+	cout<<"      *****    d  结束进程    *****       "<<endl;
+	cout<<"******************************************"<<endl;	
+
+	struct PCB *ready,*blocked,*running;
+	ready=(struct PCB *)malloc(sizeof(struct PCB));
+	blocked=(struct PCB *)malloc(sizeof(struct PCB));
+	running=(struct PCB *)malloc(sizeof(struct PCB));
+	struct PCB *p;
+	char n;
+	cin>>n;
+	switch(n){
+	case 'c':
+		p=(struct PCB *)malloc(sizeof(struct PCB));
+		cout<<"请输入进程id"<<endl;
+		cin>>p->id;
+		add(ready,p);
+		show(ready,blocked,running);
+		break;
+	case 'z':
+        run(running,p);
+		show(ready,blocked,running);
+		break;
+	case 't':      
+		p=path(ready);
+        add(running,p);
+		show(ready,blocked,running);
+		break;
+	case 'b':
+	    block(blocked,p);
+        show(ready,blocked,running);
+		break;
+	case 'w':
+		ready(blocked,ready,p);
+		show(ready,blocked,running);
+		break;
+	case 'd':
+		exit(0);
+		break;
+
+
+	}
+}
+
+
+
+
+/*#include<stdio.h>
+#include<stdlib.h>
+struct PCB{
+	int id;
+	char name[10];
+	struct PCB *next;
+};
+void creat(struct PCB *head,struct PCB *process){
+    struct PCB *temp=head;
+    while(temp->next!=NULL)
+        temp=temp->next;
+    temp->next=process;
+    process->next=NULL;
+}
+struct PCB* remove(struct PCB *head){
+	struct PCB *temp=head;
+	struct PCB *q;
+	while(temp->next!=NULL){
+		q=temp;
+		temp=temp->next;
+	}
+	q->next=NULL;
+	return temp;
+}
+void showPCB(struct PCB* head){
+	struct PCB *temp=head;
+	while(temp->next!=NULL){
+		temp=temp->next;
+		printf("进程ID：%d\n",temp->id);
+		printf("进程名字：%s\n",temp->name);
+	}
+}
+void show(struct PCB* ready,struct PCB* blocked,struct PCB* running){
+	printf("就绪的进程\n");
+	showPCB(ready);
+	printf("\n");
+	printf("阻塞中的进程\n");
+	showPCB(blocked);
+	printf("\n");
+	printf("正在运行的程序\n");
+	showPCB(running);
+	printf("\n");
+}
+void main()
+{
+	printf("************************欢迎进入进程管理模拟系统******************************\n");
+	printf("    1:创建进程\n");
+	printf("    2:运行进程\n");
+	printf("    3:时间片到\n");
+	printf("    4:进程阻塞\n");
+	printf("    5:唤醒进程\n");
+	printf("    6:结束进程\n");
+	printf("******************************************************************************\n");
+	printf("请选择操作序号！\n");
+	struct PCB *ready,*blocked,*running;
+	ready =(struct PCB *)malloc(sizeof(struct PCB));
+	ready->next = NULL;
+	blocked =(struct PCB *)malloc(sizeof(struct PCB));
+	blocked->next = NULL; 
+	running =(struct PCB *)malloc(sizeof(struct PCB));
+	running->next = NULL;
+	int n;
+	struct PCB *p;
+	while(true)
+	{
+		scanf("%d",&n);
+		switch(n)
+		{
+		case 1 :
+			p=(struct PCB *)malloc(sizeof(struct PCB));
+			printf("请输入进程ID：");
+			scanf("%d",&p->id);
+			printf("请输入进程名字：");
+			scanf("%s",&p->name);
+			creat(ready,p);
+			show(ready,blocked,running);
+			break;
+		case 2:
+			p = remove(ready);
+			creat(running,p);
+			show(ready,blocked,running);
+			break;
+		case 3 :
+			p = remove(running);
+			creat(ready,p);
+			show(ready,blocked,running);
+			break;
+		case 4 :
+			p = remove(running);
+			creat(blocked,p);
+			show(ready,blocked,running);
+			break;
+		case 5 :
+			p = remove(blocked);
+			creat(ready,p);
+			show(ready,blocked,running);
+			break;
+		case 6:
+			remove(running);
+			show(ready,blocked,running);
+			break;
+		}
+	}
+}
+
+
+
+
+
+*/
+ 
